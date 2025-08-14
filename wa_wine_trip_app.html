@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Washington Wine Trip Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            color: #722f37;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .quiz-question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #722f37;
+        }
+        
+        .quiz-question h3 {
+            color: #722f37;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .quiz-options {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .quiz-option {
+            padding: 15px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .quiz-option:hover {
+            border-color: #722f37;
+            transform: translateX(5px);
+        }
+        
+        .quiz-option input {
+            margin-right: 12px;
+        }
+        
+        .varietal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .varietal-option {
+            padding: 12px 15px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        
+        .varietal-option:hover, .varietal-option.selected {
+            border-color: #722f37;
+            background: #f8f3f0;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #722f37, #8b3a42);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.85em;
+            margin: 2px;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        #map {
+            height: 500px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+        }
+        
+        .winery-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .winery-name {
+            font-size: 1.4em;
+            color: #722f37;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .varietals {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .varietal-tag {
+            background: #722f37;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .winery-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #722f37;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #722f37;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        
+        .alternative-wineries {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .alternative-winery {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .alternative-winery:hover {
+            border-color: #722f37;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #722f37;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍷 Washington Wine Country</h1>
+            <p>Discover Your Perfect Wine Journey Through the Pacific Northwest</p>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz-section" class="section">
+            <h2 style="color: #722f37; margin-bottom: 30px; text-align: center; font-size: 2em;">Plan Your Wine Adventure</h2>
+            
+            <div class="quiz-question">
+                <h3>Which grape varietals do you most enjoy? (Select all that apply)</h3>
+                <div class="varietal-grid" id="varietal-selection">
+                    <div class="varietal-option" data-varietal="cabernet-sauvignon">Cabernet Sauvignon</div>
+                    <div class="varietal-option" data-varietal="merlot">Merlot</div>
+                    <div class="varietal-option" data-varietal="syrah">Syrah/Shiraz</div>
+                    <div class="varietal-option" data-varietal="pinot-noir">Pinot Noir</div>
+                    <div class="varietal-option" data-varietal="chardonnay">Chardonnay</div>
+                    <div class="varietal-option" data-varietal="riesling">Riesling</div>
+                    <div class="varietal-option" data-varietal="sauvignon-blanc">Sauvignon Blanc</div>
+                    <div class="varietal-option" data-varietal="gewurztraminer">Gewürztraminer</div>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>How long is your trip?</h3>
+                <div class="quiz-options">
+                    <label class="quiz-option">
+                        <input type="radio" name="trip-duration" value="day">
+                        <span>Day trip (3-4 wineries)</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="trip-duration" value="weekend">
+                        <span>Weekend getaway (6-8 wineries)</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="trip-duration" value="week">
+                        <span>Week-long adventure (12+ wineries)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Which region interests you most?</h3>
+                <div class="quiz-options">
+                    <label class="quiz-option">
+                        <input type="radio" name="region-preference" value="walla-walla">
+                        <span>Walla Walla Valley - Famous for Cabernet Sauvignon and Syrah</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="region-preference" value="yakima">
+                        <span>Yakima Valley - Diverse varietals with excellent Riesling</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="region-preference" value="woodinville">
+                        <span>Woodinville - Convenient from Seattle with many tasting rooms</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn" onclick="generateItinerary()" style="display: block; margin: 30px auto;">
+                Create My Wine Trip 🍇
+            </button>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loading-section" class="section hidden">
+            <div class="loading">
+                <div class="spinner"></div>
+                <h3>Creating your perfect wine journey...</h3>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="section hidden">
+            <h2 style="color: #722f37; margin-bottom: 30px; text-align: center;">Your Personalized Wine Itinerary</h2>
+            
+            <div id="map"></div>
+            
+            <div id="itinerary-details"></div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('booking-modal')">&times;</span>
+            <h2 style="color: #722f37;">Book Tasting at <span id="booking-winery-name"></span></h2>
+            <form id="booking-form" onsubmit="submitBooking(event)">
+                <div class="form-group">
+                    <label>Your Name:</label>
+                    <input type="text" id="visitor-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="visitor-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone:</label>
+                    <input type="tel" id="visitor-phone" required>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Date:</label>
+                    <input type="date" id="tasting-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Party Size:</label>
+                    <select id="party-size" required>
+                        <option value="">Select size</option>
+                        <option value="2">2 people</option>
+                        <option value="4">4 people</option>
+                        <option value="6">6 people</option>
+                        <option value="8">8+ people</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Request Booking</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Replace Modal -->
+    <div id="replace-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('replace-modal')">&times;</span>
+            <h2 style="color: #722f37;">Replace Winery</h2>
+            <div id="alternative-wineries" class="alternative-wineries"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedVarietals = [];
+        let currentItinerary = {};
+        let bookings = {};
+        
+        // Wine data
+        const wineData = {
+            'walla-walla': {
+                name: 'Walla Walla Valley',
+                wineries: [
+                    {
+                        name: "Leonetti Cellar",
+                        varietals: ["cabernet-sauvignon", "merlot", "sangiovese"],
+                        description: "Historic family winery known for age-worthy reds",
+                        coords: [46.0645, -118.3430]
+                    },
+                    {
+                        name: "Woodward Canyon",
+                        varietals: ["cabernet-sauvignon", "chardonnay", "merlot"],
+                        description: "Pioneer winery acclaimed for Cabernet and Chardonnay",
+                        coords: [46.0755, -118.3340]
+                    },
+                    {
+                        name: "L'Ecole No 41",
+                        varietals: ["syrah", "cabernet-sauvignon", "semillon"],
+                        description: "Historic schoolhouse winery with Rhône varietals",
+                        coords: [46.0655, -118.3530]
+                    },
+                    {
+                        name: "Pepper Bridge Winery",
+                        varietals: ["cabernet-sauvignon", "merlot", "cabernet-franc"],
+                        description: "Estate vineyard specializing in Bordeaux varietals",
+                        coords: [46.0545, -118.3630]
+                    }
+                ]
+            },
+            'yakima': {
+                name: 'Yakima Valley',
+                wineries: [
+                    {
+                        name: "Charles Smith Wines",
+                        varietals: ["syrah", "cabernet-sauvignon", "riesling"],
+                        description: "Rock-inspired winery with bold, modern wines",
+                        coords: [46.6021, -120.5059]
+                    },
+                    {
+                        name: "Kiona Vineyards",
+                        varietals: ["riesling", "chardonnay", "gewurztraminer"],
+                        description: "Family-owned pioneer known for ice wines",
+                        coords: [46.5821, -119.4959]
+                    },
+                    {
+                        name: "Treveri Cellars",
+                        varietals: ["chardonnay", "pinot-noir", "riesling"],
+                        description: "Washington's premier sparkling wine specialists",
+                        coords: [46.5721, -120.4859]
+                    }
+                ]
+            },
+            'woodinville': {
+                name: 'Woodinville Wine Country',
+                wineries: [
+                    {
+                        name: "Chateau Ste. Michelle",
+                        varietals: ["chardonnay", "cabernet-sauvignon", "riesling"],
+                        description: "Washington's oldest and most visited winery",
+                        coords: [47.7540, -122.1624]
+                    },
+                    {
+                        name: "Columbia Winery",
+                        varietals: ["cabernet-sauvignon", "merlot", "chardonnay"],
+                        description: "Pioneer in Washington winemaking",
+                        coords: [47.7640, -122.1524]
+                    },
+                    {
+                        name: "DeLille Cellars",
+                        varietals: ["cabernet-sauvignon", "merlot", "sauvignon-blanc"],
+                        description: "Premium Bordeaux-style blends",
+                        coords: [47.7440, -122.1724]
+                    }
+                ]
+            }
+        };
+
+        // Initialize varietal selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const varietalOptions = document.querySelectorAll('.varietal-option');
+            varietalOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const varietal = this.dataset.varietal;
+                    if (this.classList.contains('selected')) {
+                        this.classList.remove('selected');
+                        selectedVarietals = selectedVarietals.filter(v => v !== varietal);
+                    } else {
+                        this.classList.add('selected');
+                        selectedVarietals.push(varietal);
+                    }
+                });
+            });
+
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tasting-date').min = today;
+        });
+
+        function generateItinerary() {
+            const duration = document.querySelector('input[name="trip-duration"]:checked')?.value;
+            const region = document.querySelector('input[name="region-preference"]:checked')?.value;
+            
+            if (!duration || !region || selectedVarietals.length === 0) {
+                alert('Please answer all questions and select at least one grape varietal.');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('quiz-section').classList.add('hidden');
+            document.getElementById('loading-section').classList.remove('hidden');
+            
+            setTimeout(() => {
+                createItinerary(duration, region);
+                document.getElementById('loading-section').classList.add('hidden');
+                document.getElementById('results-section').classList.remove('hidden');
+            }, 2000);
+        }
+        
+        function createItinerary(duration, region) {
+            const regionData = wineData[region];
+            
+            // Score and filter wineries
+            const scoredWineries = regionData.wineries.map(winery => {
+                const matches = winery.varietals.filter(v => selectedVarietals.includes(v));
+                return {
+                    ...winery,
+                    score: matches.length,
+                    matchedVarietals: matches
+                };
+            }).sort((a, b) => b.score - a.score);
+            
+            currentItinerary = {
+                duration,
+                region,
+                wineries: scoredWineries,
+                regionData
+            };
+            
+            // Create map
+            createMap(region, scoredWineries);
+            
+            // Create itinerary
+            createItineraryDisplay(scoredWineries, duration, regionData.name);
+        }
+        
+        function createMap(region, wineries) {
+            const mapDiv = document.getElementById('map');
+            
+            let mapUrl = '';
+            switch(region) {
+                case 'walla-walla':
+                    mapUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d187000!2d-118.5!3d46.06!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x549620ac3c5f2f95%3A0x762ba2c7b84dd1d5!2sWalla%20Walla%2C%20WA!5e0!3m2!1sen!2sus!4v1692000000000!5m2!1sen!2sus';
+                    break;
+                case 'yakima':
+                    mapUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d187000!2d-120.5!3d46.60!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5499d8b54a9b888b%3A0x8d05c7b9caf0b3e2!2sYakima%2C%20WA!5e0!3m2!1sen!2sus!4v1692000000001!5m2!1sen!2sus';
+                    break;
+                case 'woodinville':
+                    mapUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d43000!2d-122.18!3d47.75!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x54900c9b8c5b8b8b%3A0x7b41b8b8b8b8b8b8!2sWoodinville%2C%20WA!5e0!3m2!1sen!2sus!4v1692000000003!5m2!1sen!2sus';
+                    break;
+            }
+            
+            mapDiv.innerHTML = `
+                <iframe 
+                    width="100%" 
+                    height="500" 
+                    frameborder="0" 
+                    style="border-radius: 10px;"
+                    src="${mapUrl}"
+                    allowfullscreen>
+                </iframe>
+            `;
+        }
+        
+        function createItineraryDisplay(wineries, duration, regionName) {
+            const maxWineries = duration === 'day' ? 4 : duration === 'weekend' ? 6 : 8;
+            const selectedWineries = wineries.slice(0, maxWineries);
+            
+            let html = `<h3 style="color: #722f37; margin-bottom: 20px;">Your ${duration === 'day' ? 'Day' : duration === 'weekend' ? 'Weekend' : 'Week'} Trip to ${regionName}</h3>`;
+            
+            selectedWineries.forEach((winery, index) => {
+                html += `
+                    <div class="winery-card" id="winery-${index}">
+                        <button class="remove-btn" onclick="removeWinery(${index})">×</button>
+                        <div class="winery-name">${winery.name}</div>
+                        <p style="color: #666; margin-bottom: 10px;">${winery.description}</p>
+                        <p style="color: #0c5460; font-weight: bold;">Match: ${winery.matchedVarietals.length}/${selectedVarietals.length} varietals</p>
+                        <div class="varietals">
+                            ${winery.varietals.map(v => 
+                                `<span class="varietal-tag" style="${winery.matchedVarietals.includes(v) ? '' : 'background: #6c757d;'}">${v.replace('-', ' ').toUpperCase()}</span>`
+                            ).join('')}
+                        </div>
+                        <div class="winery-actions">
+                            <button class="btn btn-small" onclick="openBookingModal('${winery.name}', ${index})">Book Tasting</button>
+                            <button class="btn btn-secondary btn-small" onclick="openReplaceModal(${index})">Replace</button>
+                            <button class="btn btn-secondary btn-small" onclick="getDirections(${winery.coords[0]}, ${winery.coords[1]})">Directions</button>
+                        </div>
+                        ${bookings[index] ? `<div style="margin-top: 10px; padding: 8px; background: #d1edff; border-radius: 5px; color: #0c5460;">✓ Booking requested for ${bookings[index].date}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('itinerary-details').innerHTML = html;
+        }
+        
+        function openBookingModal(wineryName, index) {
+            document.getElementById('booking-winery-name').textContent = wineryName;
+            document.getElementById('booking-modal').style.display = 'block';
+            document.getElementById('booking-modal').dataset.wineryIndex = index;
+        }
+        
+        function openReplaceModal(index) {
+            const alternatives = currentItinerary.regionData.wineries.filter((w, i) => 
+                !currentItinerary.wineries.slice(0, 6).map(winery => winery.name).includes(w.name)
+            );
+            
+            let html = '';
+            alternatives.forEach(alt => {
+                const matches = alt.varietals.filter(v => selectedVarietals.includes(v));
+                html += `
+                    <div class="alternative-winery" onclick="replaceWinery(${index}, '${alt.name}')">
+                        <h4 style="color: #722f37;">${alt.name}</h4>
+                        <p style="font-size: 0.9em; margin: 5px 0;">${alt.description}</p>
+                        <div class="varietals">
+                            ${alt.varietals.map(v => `<span class="varietal-tag" style="font-size: 0.7em;">${v.replace('-', ' ').toUpperCase()}</span>`).join('')}
+                        </div>
+                        <p style="font-size: 0.8em; margin-top: 8px; color: #666;">Matches ${matches.length} of your preferences</p>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('alternative-wineries').innerHTML = html;
+            document.getElementById('replace-modal').style.display = 'block';
+        }
+        
+        function replaceWinery(index, newWineryName) {
+            const newWinery = currentItinerary.regionData.wineries.find(w => w.name === newWineryName);
+            if (newWinery) {
+                const matches = newWinery.varietals.filter(v => selectedVarietals.includes(v));
+                currentItinerary.wineries[index] = {
+                    ...newWinery,
+                    score: matches.length,
+                    matchedVarietals: matches
+                };
+                
+                createItineraryDisplay(currentItinerary.wineries, currentItinerary.duration, currentItinerary.regionData.name);
+                closeModal('replace-modal');
+            }
+        }
+        
+        function removeWinery(index) {
+            if (confirm('Remove this winery from your itinerary?')) {
+                currentItinerary.wineries.splice(index, 1);
+                createItineraryDisplay(currentItinerary.wineries, currentItinerary.duration, currentItinerary.regionData.name);
+            }
+        }
+        
+        function submitBooking(event) {
+            event.preventDefault();
+            const index = document.getElementById('booking-modal').dataset.wineryIndex;
+            const name = document.getElementById('visitor-name').value;
+            const email = document.getElementById('visitor-email').value;
+            const date = document.getElementById('tasting-date').value;
+            
+            bookings[index] = { name, email, date };
+            
+            alert(`Booking request submitted! We'll contact ${name} at ${email} to confirm your ${date} tasting.`);
+            
+            closeModal('booking-modal');
+            document.getElementById('booking-form').reset();
+            createItineraryDisplay(currentItinerary.wineries, currentItinerary.duration, currentItinerary.regionData.name);
+        }
+        
+        function getDirections(lat, lng) {
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+            window.open(url, '_blank');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
